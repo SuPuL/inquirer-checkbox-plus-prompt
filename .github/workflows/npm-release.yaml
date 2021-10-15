@@ -21,13 +21,14 @@ jobs:
       - name: Get package version
         run: |
           export VERSION=`cat package.json | grep version | sed -E 's/.*: "(.*)",/\1/'`
+          export PKG_NAME=`cat package.json | grep '"name"' | sed -E 's/.*: "(.*)",/\1/'`
           echo "PKG_VERSION=$VERSION" >> $GITHUB_ENV
       - name: Update dist-tag
-        run: npm dist-tag add @axway/axway@${PKG_VERSION} latest
+        run: npm dist-tag add ${PKG_NAME}@${PKG_VERSION} latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Remove 'next' dist-tag
-        run: npm dist-tag rm @axway/axway next
+        run: npm dist-tag rm ${PKG_NAME} next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
