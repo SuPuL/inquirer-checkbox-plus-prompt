@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/faressoft/inquirer-checkbox-plus-prompt.git"
+    "url": "https://github.com/Axway/inquirer-checkbox-plus-prompt.git"
   },
   "keywords": [
     "inquirer",
