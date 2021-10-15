@@ -24,6 +24,12 @@ jobs:
           export NAME=`cat package.json | grep '"name"' | sed -E 's/.*: "(.*)",/\1/'`
           echo "PKG_VERSION=$VERSION" >> $GITHUB_ENV
           echo "PKG_NAME=$NAME" >> $GITHUB_ENV
+
+      - name: Get package name
+        run: |
+          export NAME=`cat package.json | grep '"name"' | sed -E 's/.*: "(.*)",/\1/'`
+          echo "PKG_NAME=$NAME" >> $GITHUB_ENV
+
       - name: Update dist-tag
         run: npm dist-tag add ${PKG_NAME}@${PKG_VERSION} latest
         env:
