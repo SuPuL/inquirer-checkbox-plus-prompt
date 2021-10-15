@@ -23,11 +23,11 @@ jobs:
           export VERSION=`cat package.json | grep version | sed -E 's/.*: "(.*)",/\1/'`
           echo "PKG_VERSION=$VERSION" >> $GITHUB_ENV
       - name: Update dist-tag
-        run: npm dist-tag add @axway/axsway@${PKG_VERSION} latest
+        run: npm dist-tag add @axway/axway@${PKG_VERSION} latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Remove 'next' dist-tag
-        run: npm dist-tag rm @axway/axsway next
+        run: npm dist-tag rm @axway/axway next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
