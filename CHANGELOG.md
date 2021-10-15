@@ -1,6 +1,7 @@
 # Changes
 
 1.1.0:
+  * Changed module name to @axway/inquirer-checkbox-plus-prompt
   * Updated dependencies to fix vulnerability [CVE-2021-3807](https://nvd.nist.gov/vuln/detail/CVE-2021-3807)
   * Updated code to use newer version of inquirer.
 
