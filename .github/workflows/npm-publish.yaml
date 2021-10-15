@@ -27,15 +27,17 @@ jobs:
         env:
           CI: true
 
-      - name: Get package version
-        run: |
-          export VERSION=`cat package.json | grep version | sed -E 's/.*: "(.*)",/\1/'`
-          echo "DIST_TAG=v$VERSION" >> $GITHUB_ENV
-      - name: Build
-        run: npm run gulp
+      # - name: Get package version
+      #   run: |
+      #     export VERSION=`cat package.json | grep version | sed -E 's/.*: "(.*)",/\1/'`
+      #     echo "DIST_TAG=v$VERSION" >> $GITHUB_ENV
+      # - name: Build
+      #   run: npm run build
 
       - name: Tag repo with $DIST_TAG
         run: |
+          export VERSION=`cat package.json | grep version | sed -E 's/.*: "(.*)",/\1/'`
+          echo "DIST_TAG=v$VERSION" >> $GITHUB_ENV
           git tag $DIST_TAG
           git push origin $DIST_TAG
       - name: Publish to npm with dist-tag next
