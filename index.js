@@ -45,7 +45,7 @@ class CheckboxPlusPrompt extends Base {
       this.opt.default = null;
     }
 
-    this.opt.useDefaultIfEmpty = Boolean(this.opt.defaultIfEmpty);
+    this.opt.useDefaultIfEmpty = Boolean(this.opt.useDefaultIfEmpty);
 
     // Doesn't have source option
     if (!this.opt.source) {
