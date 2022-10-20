@@ -61,6 +61,7 @@ class CheckboxPlusPrompt extends Base {
     this.lastSourcePromise = null;
     this.default = this.opt.default;
     this.opt.default = null;
+    this.selectOnEnterIfEmpty = Boolean(this.opt.selectOnEnterIfEmpty);
     this.useDefaultIfEmpty = Boolean(this.opt.useDefaultIfEmpty);
     if (this.useDefaultIfEmpty) {
       this.defaultOnEnd = [...this.default];
@@ -279,7 +280,7 @@ class CheckboxPlusPrompt extends Base {
    */
   onEnd(state) {
     // Set default if no value is set
-    if (!this.value.length && this.defaultOnEnd) {
+    if (!state.value.length && this.defaultOnEnd) {
       // Is the current choice included in the default values
       this.choices.forEach((choice) => {
         if (
@@ -289,6 +290,16 @@ class CheckboxPlusPrompt extends Base {
           this.toggleChoice(choice, true);
         }
       });
+      state.value = [...this.value];
+    }
+
+    if (
+      !state.value.length &&
+      this.selectOnEnterIfEmpty &&
+      this.choices.getChoice(this.pointer)
+    ) {
+      this.toggleChoice(this.choices.getChoice(this.pointer));
+      this.render();
       state.value = [...this.value];
     }
 

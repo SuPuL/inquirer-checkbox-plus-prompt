@@ -36,6 +36,7 @@ The extra options that this plugin provides are:
 - **highlight**: (Boolean) if `true`, the current selected choice gets highlighted. Default: `false`.
 - **searchable**: (Boolean) if `true`, allow the user to filter the list. The `source` function gets called everytime the search query is changed. Default: `false`.
 - **useDefaultIfEmpty**: (Boolean) if `true`, select the default not on start but on end if no value was selected. Default: `false`.
+- **selectOnEnterIfEmpty**: (Boolean) if `true`, select the current hovering value if enter is pressed and no others are selected. Default: `false`.
 
 # Example
 
@@ -60,6 +61,7 @@ inquirer
       searchable: true,
       default: ["yellow", "red"],
       useDefaultIfEmpty: true,
+      selectOnEnterIfEmpty: true,
       source: function (answersSoFar, input) {
         input = input || "";
 
