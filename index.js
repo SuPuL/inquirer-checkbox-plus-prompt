@@ -177,7 +177,7 @@ class CheckboxPlusPrompt extends Base {
         }
 
         // The default is not applied yet
-        if (self.default && self.useDefaultIfEmpty) {
+        if (self.default && !self.useDefaultIfEmpty) {
           // Is the current choice included in the default values
           if (
             _.findIndex(self.default, _.isEqual.bind(null, choice.value)) != -1
@@ -276,9 +276,11 @@ class CheckboxPlusPrompt extends Base {
    */
   onEnd(state) {
     // Set default if no value is set
-    if (!this.value.length && this.default && this.useDefaultIfEmpty) {
+    if (!this.value.length && this.opt.default && this.opt.useDefaultIfEmpty) {
       // Is the current choice included in the default values
-      if (_.findIndex(this.default, _.isEqual.bind(null, choice.value)) != -1) {
+      if (
+        _.findIndex(this.opt.default, _.isEqual.bind(null, choice.value)) != -1
+      ) {
         this.toggleChoice(choice, true);
       }
     }
