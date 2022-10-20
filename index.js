@@ -4,23 +4,22 @@
  * @author Mohammad Fares <faressoft.com@gmail.com>
  */
 
-'use strict';
+"use strict";
 
-var _ = require('lodash');
-var chalk = require('chalk');
-var { map, takeUntil } = require('rxjs/operators');
-var cliCursor = require('cli-cursor');
-var figures = require('figures');
-var Base = require('inquirer/lib/prompts/base');
-var Choices = require('inquirer/lib/objects/choices');
-var observe = require('inquirer/lib/utils/events');
-var Paginator = require('inquirer/lib/utils/paginator');
+var _ = require("lodash");
+var chalk = require("chalk");
+var { map, takeUntil } = require("rxjs/operators");
+var cliCursor = require("cli-cursor");
+var figures = require("figures");
+var Base = require("inquirer/lib/prompts/base");
+var Choices = require("inquirer/lib/objects/choices");
+var observe = require("inquirer/lib/utils/events");
+var Paginator = require("inquirer/lib/utils/paginator");
 
 /**
  * CheckboxPlusPrompt
  */
 class CheckboxPlusPrompt extends Base {
-
   /**
    * Initialize the prompt
    *
@@ -29,27 +28,28 @@ class CheckboxPlusPrompt extends Base {
    * @param  {Object} answers
    */
   constructor(questions, rl, answers) {
-
     super(questions, rl, answers);
 
     // Default value for the highlight option
-    if (typeof this.opt.highlight == 'undefined') {
+    if (typeof this.opt.highlight == "undefined") {
       this.opt.highlight = false;
     }
 
     // Default value for the searchable option
-    if (typeof this.opt.searchable == 'undefined') {
+    if (typeof this.opt.searchable == "undefined") {
       this.opt.searchable = false;
     }
 
     // Default value for the default option
-    if (typeof this.opt.default == 'undefined') {
+    if (typeof this.opt.default == "undefined") {
       this.opt.default = null;
     }
 
+    this.opt.useDefaultIfEmpty = Boolean(this.opt.defaultIfEmpty);
+
     // Doesn't have source option
     if (!this.opt.source) {
-      this.throwParamError('source');
+      this.throwParamError("source");
     }
 
     // Init
@@ -65,7 +65,6 @@ class CheckboxPlusPrompt extends Base {
     this.opt.default = null;
 
     this.paginator = new Paginator(this.screen);
-
   }
 
   /**
@@ -75,13 +74,11 @@ class CheckboxPlusPrompt extends Base {
    * @return {this}
    */
   _run(callback) {
-
     var self = this;
 
     this.done = callback;
 
-    this.executeSource().then(function(result) {
-
+    this.executeSource().then(function (result) {
       var events = observe(self.rl);
 
       var validation = self.handleSubmitEvents(
@@ -105,7 +102,6 @@ class CheckboxPlusPrompt extends Base {
 
       // If the search is enabled
       if (!self.opt.searchable) {
-
         events.numberKey
           .pipe(takeUntil(validation.success))
           .forEach(self.onNumberKey.bind(self));
@@ -115,7 +111,6 @@ class CheckboxPlusPrompt extends Base {
         events.iKey
           .pipe(takeUntil(validation.success))
           .forEach(self.onInverseKey.bind(self));
-
       } else {
         events.keypress
           .pipe(takeUntil(validation.success))
@@ -129,18 +124,15 @@ class CheckboxPlusPrompt extends Base {
       // Init the prompt
       cliCursor.hide();
       self.render();
-
     });
 
     return this;
-
   }
 
   /**
    * Execute the source function to get the choices and render them
    */
   executeSource() {
-
     var self = this;
     var sourcePromise = null;
 
@@ -163,8 +155,7 @@ class CheckboxPlusPrompt extends Base {
     this.lastSourcePromise = sourcePromise;
     this.searching = true;
 
-    sourcePromise.then(function(choices) {
-
+    sourcePromise.then(function (choices) {
       // Is not the last issued promise
       if (self.lastSourcePromise !== sourcePromise) {
         return;
@@ -177,8 +168,7 @@ class CheckboxPlusPrompt extends Base {
       self.choices = new Choices(choices, self.answers);
 
       // Foreach choice
-      self.choices.forEach(function(choice) {
-
+      self.choices.forEach(function (choice) {
         // Is the current choice included in the current checked choices
         if (_.findIndex(self.value, _.isEqual.bind(null, choice.value)) != -1) {
           self.toggleChoice(choice, true);
@@ -187,15 +177,14 @@ class CheckboxPlusPrompt extends Base {
         }
 
         // The default is not applied yet
-        if (self.default) {
-
+        if (self.default && self.useDefaultIfEmpty) {
           // Is the current choice included in the default values
-          if (_.findIndex(self.default, _.isEqual.bind(null, choice.value)) != -1) {
+          if (
+            _.findIndex(self.default, _.isEqual.bind(null, choice.value)) != -1
+          ) {
             self.toggleChoice(choice, true);
           }
-
         }
-
       });
 
       // Reset the pointer to select the first choice
@@ -203,12 +192,9 @@ class CheckboxPlusPrompt extends Base {
       self.render();
       self.default = null;
       self.firstSourceLoading = false;
-
-
     });
 
     return sourcePromise;
-
   }
 
   /**
@@ -217,83 +203,69 @@ class CheckboxPlusPrompt extends Base {
    * @param  {Object} error
    */
   render(error) {
-
     // Render question
     var message = this.getQuestion();
-    var bottomContent = '';
+    var bottomContent = "";
 
     // Answered
-    if (this.status === 'answered') {
-
-      message += chalk.cyan(this.selection.join(', '));
+    if (this.status === "answered") {
+      message += chalk.cyan(this.selection.join(", "));
       return this.screen.render(message, bottomContent);
-
     }
 
     // No search query is entered before
     if (this.firstSourceLoading) {
-
       // If the search is enabled
       if (this.opt.searchable) {
-
         message +=
-          '(Press ' +
-          chalk.cyan.bold('<space>') +
-          ' to select, ' +
-          'or type anything to filter the list)';
-
+          "(Press " +
+          chalk.cyan.bold("<space>") +
+          " to select, " +
+          "or type anything to filter the list)";
       } else {
-
         message +=
-          '(Press ' +
-          chalk.cyan.bold('<space>') +
-          ' to select, ' +
-          chalk.cyan.bold('<a>') +
-          ' to toggle all, ' +
-          chalk.cyan.bold('<i>') +
-          ' to invert selection)';
-
+          "(Press " +
+          chalk.cyan.bold("<space>") +
+          " to select, " +
+          chalk.cyan.bold("<a>") +
+          " to toggle all, " +
+          chalk.cyan.bold("<i>") +
+          " to invert selection)";
       }
-
     }
 
     // If the search is enabled
     if (this.opt.searchable) {
-
       // Print the current search query
       message += this.rl.line;
-
     }
 
     // Searching mode
     if (this.searching) {
+      message += "\n  " + chalk.cyan("Searching...");
 
-      message += '\n  ' + chalk.cyan('Searching...');
-
-    // No choices
+      // No choices
     } else if (!this.choices.length) {
+      message += "\n  " + chalk.yellow("No results...");
 
-      message += '\n  ' + chalk.yellow('No results...');
-
-    // Has choices
+      // Has choices
     } else {
-
       var choicesStr = this.renderChoices(this.choices, this.pointer);
 
       var indexPosition = this.choices.indexOf(
         this.choices.getChoice(this.pointer)
       );
 
-      message += '\n' + this.paginator.paginate(choicesStr, indexPosition, this.opt.pageSize);
-
+      message +=
+        "\n" +
+        this.paginator.paginate(choicesStr, indexPosition, this.opt.pageSize);
     }
 
     if (error) {
-      bottomContent = chalk.red('>> ') + error;
+      bottomContent = chalk.red(">> ") + error;
     }
 
     this.screen.render(message, bottomContent);
-
   }
 
   /**
@@ -303,8 +275,15 @@ class CheckboxPlusPrompt extends Base {
    * @param {Object} state
    */
   onEnd(state) {
+    // Set default if no value is set
+    if (!this.value.length && this.default && this.useDefaultIfEmpty) {
+      // Is the current choice included in the default values
+      if (_.findIndex(this.default, _.isEqual.bind(null, choice.value)) != -1) {
+        this.toggleChoice(choice, true);
+      }
+    }
 
-    this.status = 'answered';
+    this.status = "answered";
 
     // Rerender prompt (and clean subline error)
     this.render();
@@ -312,7 +291,6 @@ class CheckboxPlusPrompt extends Base {
     this.screen.done();
     cliCursor.show();
     this.done(state.value);
-
   }
 
   /**
@@ -331,10 +309,8 @@ class CheckboxPlusPrompt extends Base {
    * @return {Array}
    */
   getCurrentValue() {
-
-    this.selection = _.map(this.checkedChoices, 'short');
-    return _.map(this.checkedChoices, 'value');
-
+    this.selection = _.map(this.checkedChoices, "short");
+    return _.map(this.checkedChoices, "value");
   }
 
   /**
@@ -342,11 +318,9 @@ class CheckboxPlusPrompt extends Base {
    * When the user press `Up` key
    */
   onUpKey() {
-
     var len = this.choices.realLength;
     this.pointer = this.pointer > 0 ? this.pointer - 1 : len - 1;
     this.render();
-
   }
 
   /**
@@ -354,11 +328,9 @@ class CheckboxPlusPrompt extends Base {
    * When the user press `Down` key
    */
   onDownKey() {
-
     var len = this.choices.realLength;
     this.pointer = this.pointer < len - 1 ? this.pointer + 1 : 0;
     this.render();
-
   }
 
   /**
@@ -366,14 +338,12 @@ class CheckboxPlusPrompt extends Base {
    * When the user press a number key
    */
   onNumberKey(input) {
-
     if (input <= this.choices.realLength) {
       this.pointer = input - 1;
       this.toggleChoice(this.choices.getChoice(this.pointer));
     }
 
     this.render();
-
   }
 
   /**
@@ -381,7 +351,6 @@ class CheckboxPlusPrompt extends Base {
    * When the user press `Space` key
    */
   onSpaceKey() {
-
     // When called no results
     if (!this.choices.getChoice(this.pointer)) {
       return;
@@ -389,7 +358,6 @@ class CheckboxPlusPrompt extends Base {
 
     this.toggleChoice(this.choices.getChoice(this.pointer));
     this.render();
-
   }
 
   /**
@@ -397,21 +365,19 @@ class CheckboxPlusPrompt extends Base {
    * When the user press 'a' key
    */
   onAllKey() {
-
     var shouldBeChecked = Boolean(
-      this.choices.find(function(choice) {
-        return choice.type !== 'separator' && !choice.checked;
+      this.choices.find(function (choice) {
+        return choice.type !== "separator" && !choice.checked;
       })
     );
 
-    this.choices.forEach(function(choice) {
-      if (choice.type !== 'separator') {
+    this.choices.forEach(function (choice) {
+      if (choice.type !== "separator") {
         choice.checked = shouldBeChecked;
       }
     });
 
     this.render();
-
   }
 
   /**
@@ -419,15 +385,13 @@ class CheckboxPlusPrompt extends Base {
    * When the user press `i` key
    */
   onInverseKey() {
-
-    this.choices.forEach(function(choice) {
-      if (choice.type !== 'separator') {
+    this.choices.forEach(function (choice) {
+      if (choice.type !== "separator") {
         choice.checked = !choice.checked;
       }
     });
 
     this.render();
-
   }
 
   /**
@@ -435,10 +399,8 @@ class CheckboxPlusPrompt extends Base {
    * When the user press any key
    */
   onKeypress() {
-
     this.executeSource();
     this.render();
-
   }
 
   /**
@@ -448,9 +410,8 @@ class CheckboxPlusPrompt extends Base {
    * @param {Object}  choice
    */
   toggleChoice(choice, checked) {
-
     // Default value for checked
-    if (typeof checked === 'undefined') {
+    if (typeof checked === "undefined") {
       checked = !choice.checked;
     }
 
@@ -458,7 +419,7 @@ class CheckboxPlusPrompt extends Base {
     _.remove(this.value, _.isEqual.bind(null, choice.value));
 
     // Remove the checkedChoices with the value of the current choice
-    _.remove(this.checkedChoices, function(checkedChoice) {
+    _.remove(this.checkedChoices, function (checkedChoice) {
       return _.isEqual(choice.value, checkedChoice.value);
     });
 
@@ -470,7 +431,6 @@ class CheckboxPlusPrompt extends Base {
       this.checkedChoices.push(choice);
       choice.checked = true;
     }
-
   }
 
   /**
@@ -480,9 +440,7 @@ class CheckboxPlusPrompt extends Base {
    * @return {String}
    */
   getCheckboxFigure(checked) {
-
     return checked ? chalk.green(figures.checkboxOn) : figures.checkboxOff;
-
   }
 
   /**
@@ -493,56 +451,46 @@ class CheckboxPlusPrompt extends Base {
    * @return {String} rendered content
    */
   renderChoices(choices, pointer) {
-
     var self = this;
-    var output = '';
+    var output = "";
     var separatorOffset = 0;
 
     // Foreach choice
-    choices.forEach(function(choice, index) {
-
+    choices.forEach(function (choice, index) {
       // Is a separator
-      if (choice.type === 'separator') {
-
+      if (choice.type === "separator") {
         separatorOffset++;
-        output += ' ' + choice + '\n';
+        output += " " + choice + "\n";
         return;
-
       }
 
       // Is the choice disabled
       if (choice.disabled) {
-
         separatorOffset++;
-        output += ' - ' + choice.name;
-        output += ' (' + (_.isString(choice.disabled) ? choice.disabled : 'Disabled') + ')';
-        output += '\n';
+        output += " - " + choice.name;
+        output +=
+          " (" +
+          (_.isString(choice.disabled) ? choice.disabled : "Disabled") +
+          ")";
+        output += "\n";
         return;
-
       }
 
       // Is the current choice is the selected choice
       if (index - separatorOffset === pointer) {
-
         output += chalk.cyan(figures.pointer);
-        output += self.getCheckboxFigure(choice.checked) + ' ';
+        output += self.getCheckboxFigure(choice.checked) + " ";
         output += self.opt.highlight ? chalk.gray(choice.name) : choice.name;
-
       } else {
-
-        output += ' ' + self.getCheckboxFigure(choice.checked) + ' ' + choice.name;
-
+        output +=
+          " " + self.getCheckboxFigure(choice.checked) + " " + choice.name;
       }
 
-      output += '\n';
-
-
+      output += "\n";
     });
 
-    return output.replace(/\n$/, '');
-
+    return output.replace(/\n$/, "");
   }
-
 }
 
 module.exports = CheckboxPlusPrompt;

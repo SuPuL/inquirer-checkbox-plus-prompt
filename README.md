@@ -32,52 +32,52 @@ Takes `type`, `name`, `message`, `source`[, `filter`, `validate`, `default`, `pa
 
 The extra options that this plugin provides are:
 
-* **source**: (Function) a method that called to return a promise that should be resolved with a list of choices in a similar format as the `choices` option in the original `checkbox` prompt of `Inquirer`.
-* **highlight**: (Boolean) if `true`, the current selected choice gets highlighted. Default: `false`.
-* **searchable**: (Boolean) if `true`, allow the user to filter the list. The `source` function gets called everytime the search query is changed. Default: `false`.
+- **source**: (Function) a method that called to return a promise that should be resolved with a list of choices in a similar format as the `choices` option in the original `checkbox` prompt of `Inquirer`.
+- **highlight**: (Boolean) if `true`, the current selected choice gets highlighted. Default: `false`.
+- **searchable**: (Boolean) if `true`, allow the user to filter the list. The `source` function gets called everytime the search query is changed. Default: `false`.
+- **useDefaultIfEmpty**: (Boolean) if `true`, select the default not on start but on end if no value was selected. Default: `false`.
 
 # Example
 
 Check [example.js](/example.js?raw=true) for a more advanced example.
 
 ```js
-var inquirer = require('inquirer');
-var fuzzy = require('fuzzy');
+var inquirer = require("inquirer");
+var fuzzy = require("fuzzy");
 
-inquirer.registerPrompt('checkbox-plus', require('./index'));
+inquirer.registerPrompt("checkbox-plus", require("./index"));
 
-var colors = ['red', 'green', 'blue', 'yellow'];
+var colors = ["red", "green", "blue", "yellow"];
 
-inquirer.prompt([{
-  type: 'checkbox-plus',
-  name: 'colors',
-  message: 'Enter colors',
-  pageSize: 10,
-  highlight: true,
-  searchable: true,
-  default: ['yellow', 'red'],
-  source: function(answersSoFar, input) {
+inquirer
+  .prompt([
+    {
+      type: "checkbox-plus",
+      name: "colors",
+      message: "Enter colors",
+      pageSize: 10,
+      highlight: true,
+      searchable: true,
+      default: ["yellow", "red"],
+      useDefaultIfEmpty: true,
+      source: function (answersSoFar, input) {
+        input = input || "";
 
-    input = input || '';
+        return new Promise(function (resolve) {
+          var fuzzyResult = fuzzy.filter(input, colors);
 
-    return new Promise(function(resolve) {
+          var data = fuzzyResult.map(function (element) {
+            return element.original;
+          });
 
-      var fuzzyResult = fuzzy.filter(input, colors);
-
-      var data = fuzzyResult.map(function(element) {
-        return element.original;
-      });
-
-      resolve(data);
-      
-    });
-
-  }
-}]).then(function(answers) {
-
-  console.log(answers.colors);
-
-});
+          resolve(data);
+        });
+      },
+    },
+  ])
+  .then(function (answers) {
+    console.log(answers.colors);
+  });
 ```
 
 # License
