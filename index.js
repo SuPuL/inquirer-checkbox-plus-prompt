@@ -45,8 +45,6 @@ class CheckboxPlusPrompt extends Base {
       this.opt.default = null;
     }
 
-    this.opt.useDefaultIfEmpty = Boolean(this.opt.useDefaultIfEmpty);
-
     // Doesn't have source option
     if (!this.opt.source) {
       this.throwParamError("source");
@@ -63,6 +61,11 @@ class CheckboxPlusPrompt extends Base {
     this.lastSourcePromise = null;
     this.default = this.opt.default;
     this.opt.default = null;
+    this.useDefaultIfEmpty = Boolean(this.opt.useDefaultIfEmpty);
+    if (this.useDefaultIfEmpty) {
+      this.defaultOnEnd = [...this.default];
+    }
+    this.opt.useDefaultIfEmpty = null;
 
     this.paginator = new Paginator(this.screen);
   }
@@ -276,13 +279,17 @@ class CheckboxPlusPrompt extends Base {
    */
   onEnd(state) {
     // Set default if no value is set
-    if (!this.value.length && this.opt.default && this.opt.useDefaultIfEmpty) {
+    if (!this.value.length && this.defaultOnEnd) {
       // Is the current choice included in the default values
-      if (
-        _.findIndex(this.opt.default, _.isEqual.bind(null, choice.value)) != -1
-      ) {
-        this.toggleChoice(choice, true);
-      }
+      this.choices.forEach((choice) => {
+        if (
+          _.findIndex(this.defaultOnEnd, _.isEqual.bind(null, choice.value)) !=
+          -1
+        ) {
+          this.toggleChoice(choice, true);
+        }
+      });
+      state.value = [...this.value];
     }
 
     this.status = "answered";
