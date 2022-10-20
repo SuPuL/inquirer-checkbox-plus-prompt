@@ -1,11 +1,11 @@
 {
-  "name": "@axway/inquirer-checkbox-plus-prompt",
+  "name": "@supul/inquirer-checkbox-plus-prompt",
   "version": "1.1.0",
   "description": "Checkbox with autocomplete and other additions for Inquirer",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Axway/inquirer-checkbox-plus-prompt.git"
+    "url": "https://github.com/SuPuL/inquirer-checkbox-plus-prompt"
   },
   "keywords": [
     "inquirer",
